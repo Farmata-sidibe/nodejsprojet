@@ -5,24 +5,24 @@ const Express = require("express"),
 
 router.post("/new", (req, res) => {
     console.log(req.body);
-    db.blog
+    db.marque
         .findOne({
             where: { astuce: req.body.astuce },
         })
-        .then((blog) => {
-            if (!blog) {
-                db.blog
+        .then((marque) => {
+            if (!marque) {
+                db.marque
                     .create(req.body)
-                    .then((blogitem) => {
+                    .then((marqueitem) => {
                         db.image
                             .create({
                                 image: req.body.image,
-                                blogitem: blogitem.id,
+                                marqueitem: marqueitem.id,
                             })
                             .then((image) => {
                                 res.status(200).json({
-                                    blog: blogitem,
-                                    blog: image,
+                                    marque: marqueitem,
+                                    marque: image,
                                     message: "ok ",
                                 });
                             })
@@ -34,12 +34,12 @@ router.post("/new", (req, res) => {
                         res.status(400).send("error" + err);
                     });
             } else {
-                blog
+                marque
                     .update({
-                        article: req.body.article,
+                        produit: req.body.produit,
                     })
                     .then((rep) => {
-                        res.status(200).json({ blog: rep });
+                        res.status(200).json({ marque: rep });
                     })
                     .catch((err) => {
                         res.status(403).json("not updated");
@@ -53,19 +53,19 @@ router.post("/new", (req, res) => {
 
 
 router.get("/all", (req, res) => {
-    db.blog
+    db.marque
         .findAll({
             include: [{
                 model: db.image,
             }, ],
         })
-        .then((blogs) => {
-            if (blogs) {
+        .then((marques) => {
+            if (marques) {
                 res.status(200).json({
-                    blogs: blogs,
+                    marques: marques,
                 });
             } else {
-                res.status(404).json("il n'a pas de blogs");
+                res.status(404).json("il n'a pas de marques");
             }
         })
         .catch((err) => {
@@ -74,12 +74,12 @@ router.get("/all", (req, res) => {
 });
 
 router.post("/add", (req, res) => {
-    var blogs = {
-        astuce: req.body.astuce,
+    var marques = {
+        nom: req.body.nom,
 
     };
-    //crée une nouvelle occurence( ajouter une nouvelle ligne)  qui va ajouter blogs
-    db.blog.create(blogs)
+    //crée une nouvelle occurence( ajouter une nouvelle ligne)  qui va ajouter marques
+    db.marque.create(marques)
 
     .then(rep => {
             // faire reference a rep then(rep)
@@ -93,32 +93,5 @@ router.post("/add", (req, res) => {
 
 });
 
-router.post('/addimage', (req, res) => {
-    db.image.create({
-            image: req.body.image,
-            blogId: req.body.id
-        })
-        .then(() => {
-            db.blog.findOne({
-                    where: { id: req.body.id },
-                    include: [{
-                            model: db.image
-                        }
-
-                    ]
-                })
-                .then(blog => {
-                    res.status(200).json({
-                        blog: blog
-                    })
-                })
-                .catch(err => {
-                    res.json(err)
-                })
-        })
-        .catch(err => {
-            res.json(err)
-        })
-});
 
 module.exports = router;

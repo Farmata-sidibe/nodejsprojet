@@ -5,7 +5,7 @@ const db = {};
 const dbinfo = new Sequelize("hairStyle", "root", "", {
     host: "localhost",
     dialect: "mysql",
-    port: 3308,
+    port: 3306,
     pool: {
         max: 5,
         min: 0,
@@ -73,6 +73,10 @@ db.coiffeur.hasMany(db.client, { foreignKey: "coiffeurId" });
 db.paiement.hasOne(db.facture, { foreignKey: "factureId" });
 db.produit.hasMany(db.image, { foreignKey: "produitId" });
 db.salon.hasMany(db.image, { foreignKey: "salonId" });
+db.blog.hasMany(db.image, { foreignKey: "blogId" });
+db.marque.hasMany(db.image, { foreignKey: "marqueId" });
+
+
 
 
 db.salon.belongsToMany(db.statistique, { through: "Concerner", foreignKey: "salonId" });

@@ -18,16 +18,15 @@ router.post("/new", (req, res) => {
                 db.salon
                     .create(req.body)
                     .then((salonitem) => {
-                        db.img
+                        db.image
                             .create({
-                                Status: 1,
-                                Image: req.body.img,
+                                image: req.body.image,
                                 salonId: salonitem.id,
                             })
-                            .then((img) => {
+                            .then((image) => {
                                 res.status(200).json({
                                     salon: salonitem,
-                                    salon: img,
+                                    salon: image,
                                     message: "ok ",
                                 });
                             })
@@ -98,7 +97,21 @@ router.post("/add", (req, res) => {
 });
 
 
-
+router.get("/getById/:id", (req, res) => {
+    db.salon
+        .findOne({
+            where: { id: req.params.id },
+            include: [{
+                model: db.image,
+            }, ],
+        })
+        .then((salons) => {
+            res.status(200).json({ salons: salons });
+        })
+        .catch((err) => {
+            res.json(err);
+        });
+});
 
 router.delete("/delete/:id", (req, res) => {
     console.log(req.body)

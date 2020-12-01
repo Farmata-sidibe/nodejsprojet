@@ -12,12 +12,13 @@ module.exports = (dbinfo, Sequelize) => {
                 // set autoIncrement = true
                 autoIncrement: true
             },
-            agenda: {
+            article: {
                 //set data type with max length
                 type: Sequelize.DataTypes.STRING(150),
                 // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
                 allowNull: true
             },
+
             commentaire: {
                 //set data type with max length
                 type: Sequelize.DataTypes.TEXT,
@@ -25,6 +26,12 @@ module.exports = (dbinfo, Sequelize) => {
                 allowNull: true
             },
             astuce: {
+                //set data type with max length
+                type: Sequelize.DataTypes.TEXT,
+                // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
+                allowNull: true
+            },
+            image: {
                 //set data type with max length
                 type: Sequelize.DataTypes.TEXT,
                 // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column

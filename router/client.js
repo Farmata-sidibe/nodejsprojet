@@ -6,26 +6,60 @@ var db = require("../database/db");
 
 process.env.SECRET_KEY = 'secret';
 
-router.post('/register', (req, res) => {
-    db.client.findOne({
-            where: { email: req.body.email }
+router.post("/register", (req, res) => {
+    db.client
+        .findOne({
+            // demander de recuperer l'email
+            where: { email: req.body.email },
         })
-        .then(client => {
+        .then((client) => {
             if (!client) {
                 const hash = bcrypt.hashSync(req.body.password, 10);
                 req.body.password = hash;
-                db.client.create(req.body)
-                    .then(itemclient => {
-                        res.status(200).json({
-                            message: "vous devez validé votre email",
-                            email: itemclient.email
-                        })
+                db.client
+                    .create(req.body)
+                    .then((item) => {
+                        var nodemailer = require("nodemailer");
+                        var transporter = nodemailer.createTransport({
+                            service: "gmail",
+                            auth: {
+                                user: "projetsidibe1@gmail.com",
+                                pass: "seydou98",
+                            },
+                        });
+
+                        var mailOptions = {
+                            from: "projetsidibe1@gmail.com",
+                            to: item.email,
+                            subject: "Bienvenue dans HairStyle",
+                            text: "http://localhost:8080/valide/:email" +
+                                " Valider votre email " +
+                                " " +
+                                item.email,
+                        };
+
+                        transporter.sendMail(mailOptions, function(error, info) {
+                            if (error) {
+                                res.json(error);
+                                console.log(error);
+                            } else {
+                                console.log("email sent" + info.response);
+                                res.json("email sent" + info.response);
+                            }
+                        });
                     })
-                    .catch((err) => {
-                        res.json(err);
-                    });
+                    .then((itemclient) => {
+                        res.status(200).json({
+                            message: "Vous devez valider votre mail",
+                            email: itemclient.email,
+                        });
+                    })
+
+                .catch((err) => {
+                    res.json(err);
+                });
             } else {
-                res.json("cette adresse email est déja utilisé");
+                res.json("cette adresse mail et déja utilisée");
             }
         })
         .catch((err) => {
@@ -82,8 +116,8 @@ router.post("/forgetpassword", (req, res) => {
                             host: 'smtp.gmail.com',
                             port: '587',
                             auth: {
-                                client: "projetsidibe1@gmail.com",
-                                pass: "Projetsidibe@"
+                                client: "erinawambiekele@gmail.com",
+                                pass: "tallia00"
                             },
                             secureConnection: 'false',
                             tls: {
@@ -94,7 +128,7 @@ router.post("/forgetpassword", (req, res) => {
                         });
 
                         var mailOptions = {
-                            from: "projetsidibe1@gmail.com",
+                            from: "erinawambiekele@gmail.com",
                             to: item.email,
                             subject: "Sending Email using Node.js",
                             html: "<a href=http://localhost:3000/client/pwd/" + item.forget + ">Metter a jour le mot de passe</a>"
@@ -241,5 +275,20 @@ router.get("/profile/:id", (req, res) => {
         })
 });
 
+router.get("/getById/:id", (req, res) => {
+    db.client
+        .findOne({
+            where: { id: req.params.id },
+            include: [{
+                model: db.image,
+            }, ],
+        })
+        .then((clients) => {
+            res.status(200).json({ clients: clients });
+        })
+        .catch((err) => {
+            res.json(err);
+        });
+});
 
 module.exports = router;

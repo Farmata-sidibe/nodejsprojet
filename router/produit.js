@@ -13,16 +13,16 @@ router.post("/new", (req, res) => {
                 db.produit
                     .create(req.body)
                     .then((produititem) => {
-                        db.img
+                        db.image
                             .create({
                                 Status: 1,
-                                Image: req.body.img,
+                                image: req.body.image,
                                 produitId: produititem.id,
                             })
-                            .then((img) => {
+                            .then((image) => {
                                 res.status(200).json({
                                     produit: produititem,
-                                    produit: img,
+                                    produit: image,
                                     message: "ok ",
                                 });
                             })
@@ -135,4 +135,20 @@ router.get("/findBy/:nom", (req, res) => {
             res.json(err)
         })
 })
+
+router.get("/getById/:id", (req, res) => {
+    db.produit
+        .findOne({
+            where: { id: req.params.id },
+            include: [{
+                model: db.image,
+            }, ],
+        })
+        .then((produits) => {
+            res.status(200).json({ produits: produits });
+        })
+        .catch((err) => {
+            res.json(err);
+        });
+});
 module.exports = router;

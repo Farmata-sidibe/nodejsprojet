@@ -14,6 +14,10 @@ app.use(BodyParser.json());
 app.use("/client", require("./router/client"));
 app.use("/salon", require("./router/salon"));
 app.use("/produit", require("./router/produit"));
+app.use("/blog", require("./router/blog"));
+app.use("/marque", require("./router/marque"));
+
+
 
 
 

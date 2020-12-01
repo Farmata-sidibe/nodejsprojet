@@ -18,6 +18,11 @@ module.exports = (dbinfo, Sequelize) => {
                 // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
                 allowNull: true
             },
+            image: {
+                type: Sequelize.DataTypes.TEXT,
+                // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
+                allowNull: true
+            }
 
 
 
