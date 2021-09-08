@@ -3,10 +3,12 @@ var router = express.Router();
 var bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 var db = require("../database/db");
+var randtoken = require('rand-token');
 
 process.env.SECRET_KEY = 'secret';
 
-router.post("/register", (req, res) => {
+router.post("/registor", (req, res) => {
+    console.log(req.body);
     db.client
         .findOne({
             // demander de recuperer l'email
@@ -14,6 +16,7 @@ router.post("/register", (req, res) => {
         })
         .then((client) => {
             if (!client) {
+
                 const hash = bcrypt.hashSync(req.body.password, 10);
                 req.body.password = hash;
                 db.client
@@ -21,10 +24,16 @@ router.post("/register", (req, res) => {
                     .then((item) => {
                         var nodemailer = require("nodemailer");
                         var transporter = nodemailer.createTransport({
-                            service: "gmail",
+                            host: "smtp.gmail.com",
+                            port: "587",
                             auth: {
                                 user: "projetsidibe1@gmail.com",
-                                pass: "seydou98",
+                                pass: "Projetsidibe@",
+                            },
+                            secureConnection: "false",
+                            tls: {
+                                ciphers: "SSLv3",
+                                rejectUnauthorized: false,
                             },
                         });
 
@@ -32,23 +41,28 @@ router.post("/register", (req, res) => {
                             from: "projetsidibe1@gmail.com",
                             to: item.email,
                             subject: "Bienvenue dans HairStyle",
-                            text: "http://localhost:8080/valide/:email" +
-                                " Valider votre email " +
-                                " " +
-                                item.email,
+                            text: "http://localhost:8080/validemail/" +
+                                " Valider votre compte client " +
+                                " ",
                         };
 
                         transporter.sendMail(mailOptions, function(error, info) {
                             if (error) {
-                                res.json(error);
                                 console.log(error);
+                                return error;
                             } else {
                                 console.log("email sent" + info.response);
-                                res.json("email sent" + info.response);
+                                return info.response;
                             }
                         });
                     })
-                    .then((itemclient) => {
+                    .then((clientitem) => {
+                        let token = jwt.sign(
+                            clientitem.dataValues,
+                            process.env.SECRET_KEY, {
+                                expiresIn: 1440,
+                            }
+                        );
                         res.status(200).json({
                             message: "Vous devez valider votre mail",
                             email: itemclient.email,
@@ -67,17 +81,15 @@ router.post("/register", (req, res) => {
         });
 });
 
-router.post("/login", (req, res) => {
+router.post("/llogin", (req, res) => {
     db.client.findOne({ where: { email: req.body.email } })
         .then(client => {
             console.log(client)
             if (client.Status === true) {
                 if (bcrypt.compareSync(req.body.password, client.password)) {
                     let clientdata = {
-                        nom: client.nom,
-                        prenom: client.prenom,
+                        id: client.id,
                         email: client.email,
-                        image: client.image
                     };
                     let token = jwt.sign(clientdata, process.env.SECRET_KEY, {
                         expiresIn: 1440,
@@ -93,12 +105,70 @@ router.post("/login", (req, res) => {
         })
         .catch(err => {
             res.json(err);
+        });
+});
+
+
+router.post("/sendmail", (req, res) => {
+    var token = randtoken.generate(16);
+    db.client.findOne({
+            where: { email: req.body.email }
         })
-})
+        .then(client => {
+            if (client) {
+                client.update({
+                        forget: token
+                    })
+                    .then(item => {
+                        var nodemailer = require("nodemailer");
+
+                        var transporter = nodemailer.createTransport({
+                            host: 'smtp.gmail.com',
+                            port: '587',
+                            auth: {
+                                user: "projetsidibe1@gmail.com",
+                                pass: "Projetsidibe@",
+                            },
+                            secureConnection: 'false',
+                            tls: {
+                                ciphers: 'SSLv3',
+                                rejectUnauthorized: false
+                            }
+                        });
+
+                        var mailOptions = {
+                            from: "projetsidibe1@gmail.com",
+                            to: item.email,
+                            subject: "Bienvenue dans HairStyle",
+
+                            html: "<a href=http://localhost:3000/client/validemail/" + item.forget + ">Valider votre mail</a>"
+                        };
+
+                        transporter.sendMail(mailOptions, function(error, info) {
+                            if (error) {
+                                res.json(error);
+                                console.log(error);
+                            } else {
+                                console.log("email sent" + info.response);
+                                res.json("vous avez recu un email");
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.json(err)
+                    })
+            } else {
+                res.status(404).json("client not found");
+            }
+        })
+        .catch(err => {
+            res.json(err)
+        })
+});
 
 //on appelle route générique parce que on peut l'utiliser dans plusieurs cas
 
-router.post("/forgetpassword", (req, res) => {
+/*router.post("/forgetpassword", (req, res) => {
     // ça nous permet de generer le token
     var randtoken = require('rand-token');
     var token = randtoken.generate(16);
@@ -116,8 +186,8 @@ router.post("/forgetpassword", (req, res) => {
                             host: 'smtp.gmail.com',
                             port: '587',
                             auth: {
-                                client: "erinawambiekele@gmail.com",
-                                pass: "tallia00"
+                                user: "projetsidib@gmail.com",
+                                pass: "Projetsidibe@",
                             },
                             secureConnection: 'false',
                             tls: {
@@ -128,10 +198,10 @@ router.post("/forgetpassword", (req, res) => {
                         });
 
                         var mailOptions = {
-                            from: "erinawambiekele@gmail.com",
+                            from: "projetsidib@gmail.com",
                             to: item.email,
-                            subject: "Sending Email using Node.js",
-                            html: "<a href=http://localhost:3000/client/pwd/" + item.forget + ">Metter a jour le mot de passe</a>"
+                            subject: "Réinitialisation de votre mot de passe",
+                            html: "<a href=http://localhost:8080/mpo/" + item.forget + ">Metter a jour le mot de passe</a>"
                         };
 
                         transporter.sendMail(mailOptions, function(error, info) {
@@ -140,7 +210,7 @@ router.post("/forgetpassword", (req, res) => {
                                 console.log(error);
                             } else {
                                 console.log("email sent" + info.response);
-                                res.json("email sent" + info.response);
+                                return info.response;
                             }
                         });
                     })
@@ -154,7 +224,70 @@ router.post("/forgetpassword", (req, res) => {
         .catch(err => {
             res.json(err)
         })
+});*/
+// route permet faire mot de passe oublié
+router.post("/forgetpassword", (req, res) => {
+    var randtoken = require("rand-token");
+    // ça generer le token
+    var token = randtoken.generate(16);
+    db.client
+        .findOne({
+            // recuperer l'adresse email
+            where: { email: req.body.email },
+        })
+        .then((client) => {
+            if (client) {
+                client
+                    .update({
+                        forget: token,
+                    })
+                    .then((item) => {
+                        var nodemailer = require("nodemailer");
+                        var transporter = nodemailer.createTransport({
+                            host: "smtp.gmail.com",
+                            port: "587",
+                            auth: {
+                                user: "projetsidibe1@gmail.com",
+                                pass: "Projetsidibe@",
+                            },
+                            secureConnection: "false",
+                            tls: {
+                                ciphers: "SSLv3",
+                                rejectUnauthorized: false,
+                            },
+                        });
+
+                        var mailOptions = {
+                            from: "projetsidibe1@gmail.com",
+                            to: item.email,
+                            subject: "HairStyle",
+                            text: "http://localhost:8080/updatepassword/" +
+                                " Voici le lien pour mettre à jour votre mot de passe " +
+                                " ",
+                        };
+
+                        transporter.sendMail(mailOptions, function(error, info) {
+                            if (error) {
+                                console.log(error);
+                                return error;
+                            } else {
+                                console.log("email sent" + info.response);
+                                return info.response;
+                            }
+                        });
+                    })
+                    .catch((err) => {
+                        res.json(err);
+                    });
+            } else {
+                res.status(404).json("client not found");
+            }
+        })
+        .catch((err) => {
+            res.json(err);
+        });
 });
+
 
 router.post("/updatepassword", (req, res) => {
     db.client.findOne({

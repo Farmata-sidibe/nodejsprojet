@@ -24,7 +24,7 @@ module.exports = (dbinfo, Sequelize) => {
             },
             nom: {
                 //set data type with out max length
-                type: Sequelize.DataTypes.STRING(75),
+                type: Sequelize.DataTypes.STRING(255),
             },
             ref: {
                 //set data type with out max length

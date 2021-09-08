@@ -20,6 +20,7 @@ router.post('/register', (req, res) => {
                             message: "vous devez validé votre email",
                             email: itemcoiffeur.email
                         })
+
                     })
                     .catch((err) => {
                         res.json(err);
@@ -27,6 +28,7 @@ router.post('/register', (req, res) => {
             } else {
                 res.json("cette adresse email est déja utilisé");
             }
+
         })
         .catch((err) => {
             res.json(err);

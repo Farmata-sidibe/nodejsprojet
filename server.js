@@ -12,15 +12,17 @@ app.use(BodyParser.urlencoded({ extented: false }));
 app.use(BodyParser.json());
 
 app.use("/client", require("./router/client"));
+app.use("/categorie", require("./router/categorie"));
+app.use("/sousCategorie", require("./router/sousCategorie"));
+
+
+app.use("/user", require("./router/user"));
 app.use("/salon", require("./router/salon"));
 app.use("/produit", require("./router/produit"));
 app.use("/blog", require("./router/blog"));
 app.use("/marque", require("./router/marque"));
-
-
-
-
-
+app.use("/commande", require("./router/commande"));
+app.use("/carteMenu", require("./router/carteMenu"));
 app.use("/coiffeur", require("./router/coiffeur"));
 
 

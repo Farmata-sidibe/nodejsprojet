@@ -20,10 +20,17 @@ module.exports = (dbinfo, Sequelize) => {
             },
             horaire: {
                 //set data type with max length
-                type: Sequelize.DataTypes.TEXT,
+                type: Sequelize.DataTypes.TIME,
                 // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
                 allowNull: true
             },
+            date: {
+                //set data type with max length
+                type: Sequelize.DataTypes.DATE,
+                // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
+                allowNull: true
+            },
+
 
 
         }, {

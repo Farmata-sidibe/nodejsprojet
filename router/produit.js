@@ -51,7 +51,7 @@ router.post("/new", (req, res) => {
         });
 });
 
-router.get("/all", (req, res) => {
+router.get("/p-all", (req, res) => {
     db.produit
         .findAll({
             include: [{

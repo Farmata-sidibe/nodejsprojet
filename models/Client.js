@@ -57,6 +57,10 @@ module.exports = (dbinfo, Sequelize) => {
                 type: Sequelize.DataTypes.BOOLEAN,
                 allowNull: true
             },
+            forget: {
+                type: Sequelize.DataTypes.STRING(60),
+                allowNull: true
+            },
 
         }, {
             /**

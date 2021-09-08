@@ -1,10 +1,10 @@
 module.exports = (dbinfo, Sequelize) => {
     return dbinfo.define(
-        "Concerner", {
-            statistique: {
+        "Posseder", {
+            nombre: {
                 type: Sequelize.DataTypes.TEXT,
                 allowNull: true
-            }
-        },
-    );
+            },
+
+        });
 }

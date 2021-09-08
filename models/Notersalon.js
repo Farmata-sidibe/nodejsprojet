@@ -24,5 +24,6 @@ module.exports = (dbinfo, Sequelize) => {
                     key: 'id'
                 }
             },
-        });
+        }
+    );
 }

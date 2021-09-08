@@ -15,11 +15,9 @@ router.post("/new", (req, res) => {
         })
         .then((salon) => {
             if (!salon) {
-                db.salon
-                    .create(req.body)
+                db.salon.create(req.body)
                     .then((salonitem) => {
-                        db.image
-                            .create({
+                        db.image.create({
                                 image: req.body.image,
                                 salonId: salonitem.id,
                             })

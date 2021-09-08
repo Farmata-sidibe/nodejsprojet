@@ -23,7 +23,7 @@ dbinfo
 
 
 
-
+db.user = require("../models/User")(dbinfo, Sequelize)
 db.client = require("../models/Client")(dbinfo, Sequelize);
 db.salon = require("../models/Salon")(dbinfo, Sequelize);
 db.avis = require("../models/Avis")(dbinfo, Sequelize);
@@ -55,11 +55,14 @@ db.contenir = require("../models/Contenir")(dbinfo, Sequelize);
 db.noterproduit = require("../models/noterproduit")(dbinfo, Sequelize);
 db.fournir = require("../models/Fournir")(dbinfo, Sequelize);
 db.detenir = require("../models/Detenir")(dbinfo, Sequelize);
+db.posseder = require("../models/Posseder")(dbinfo, Sequelize);
 
-db.salon.hasMany(db.carteMenu, { foreignKey: "salonId" });
+
+
+
 db.salon.hasMany(db.gestionPlanning, { foreignKey: "salonId" });
 db.ville.hasMany(db.salon, { foreignKey: "villeId" });
-db.salon.hasMany(db.coiffeur, { foreignKey: "salonId" });
+db.salon.hasOne(db.coiffeur, { foreignKey: "salonId" });
 db.salon.hasMany(db.client, { foreignKey: "salonId" });
 db.blog.hasMany(db.client, { foreignKey: "blogId" });
 db.client.hasMany(db.avis, { foreignKey: "clientId" });
@@ -70,9 +73,11 @@ db.typeDePaiement.hasMany(db.paiement, { foreignKey: "typeDePaiementId" });
 db.marque.hasMany(db.produit, { foreignKey: "marqueId" });
 db.categorie.hasMany(db.sousCategorie, { foreignKey: "categorieId" });
 db.coiffeur.hasMany(db.client, { foreignKey: "coiffeurId" });
-db.paiement.hasOne(db.facture, { foreignKey: "factureId" });
+db.paiement.hasOne(db.facture, { foreignKey: "paiementId" });
 db.produit.hasMany(db.image, { foreignKey: "produitId" });
 db.salon.hasMany(db.image, { foreignKey: "salonId" });
+db.carteMenu.hasMany(db.image, { foreignKey: "carteMenuId" });
+
 db.blog.hasMany(db.image, { foreignKey: "blogId" });
 db.marque.hasMany(db.image, { foreignKey: "marqueId" });
 
@@ -81,6 +86,12 @@ db.marque.hasMany(db.image, { foreignKey: "marqueId" });
 
 db.salon.belongsToMany(db.statistique, { through: "Concerner", foreignKey: "salonId" });
 db.statistique.belongsToMany(db.salon, { through: "Concerner", foreignKey: "statistiqueId" });
+
+db.salon.belongsToMany(db.carteMenu, { through: "Posseder", foreignKey: "salonId" });
+db.carteMenu.belongsToMany(db.salon, { through: "Posseder", foreignKey: "carteMenuId" });
+
+
+
 
 db.salon.belongsToMany(db.avis, { through: "notersalon", foreignKey: "salonId" });
 db.avis.belongsToMany(db.salon, { through: "notersalon", foreignKey: "avisId" });
@@ -99,6 +110,8 @@ db.fournisseur.belongsToMany(db.produit, { through: "Fournir", foreignKey: "four
 
 db.produit.belongsToMany(db.sousCategorie, { through: "Detenir", foreignKey: "produitId" });
 db.sousCategorie.belongsToMany(db.produit, { through: "Detenir", foreignKey: "sousCategorieId" });
+
+
 
 //lien entre la clé étrangére et la table de référence
 db.noterproduit.belongsTo(db.produit, { foreignKey: 'produitId', as: 'produit', });

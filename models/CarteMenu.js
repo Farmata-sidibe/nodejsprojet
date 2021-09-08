@@ -24,9 +24,15 @@ module.exports = (dbinfo, Sequelize) => {
                 // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
                 allowNull: true
             },
-            visuel: {
+            image: {
                 //set data type with max length
                 type: Sequelize.DataTypes.TEXT,
+                // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
+                allowNull: true
+            },
+            fournirr: {
+                //set data type with max length
+                type: Sequelize.DataTypes.STRING(250),
                 // setting allowNull to false will add NOT NULL to the column, which means an error will be if you add info in this column
                 allowNull: true
             },

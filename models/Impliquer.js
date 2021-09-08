@@ -4,5 +4,6 @@ module.exports = (dbinfo, Sequelize) => {
             meilleurProduit: {
                 type: Sequelize.DataTypes.TEXT
             }
-        });
+        }
+    );
 }
