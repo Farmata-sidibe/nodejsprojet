@@ -57,32 +57,17 @@ db.fournir = require("../models/Fournir")(dbinfo, Sequelize);
 db.detenir = require("../models/Detenir")(dbinfo, Sequelize);
 db.posseder = require("../models/Posseder")(dbinfo, Sequelize);
 
-
-
-
+db.carteMenu.hasMany(db.image, { foreignKey: "carteMenuId" });
+db.salon.hasMany(db.image, { foreignKey: "salonId" });
+db.coiffeur.hasMany(db.client, { foreignKey: "coiffeurId" });
 db.salon.hasMany(db.gestionPlanning, { foreignKey: "salonId" });
 db.ville.hasMany(db.salon, { foreignKey: "villeId" });
 db.salon.hasOne(db.coiffeur, { foreignKey: "salonId" });
 db.salon.hasMany(db.client, { foreignKey: "salonId" });
-db.blog.hasMany(db.client, { foreignKey: "blogId" });
-db.client.hasMany(db.avis, { foreignKey: "clientId" });
-db.client.hasMany(db.commande, { foreignKey: "clientId" });
 db.livraison.hasMany(db.commande, { foreignKey: "livraisonId" });
-db.paiement.hasMany(db.commande, { foreignKey: "paiementId" });
 db.typeDePaiement.hasMany(db.paiement, { foreignKey: "typeDePaiementId" });
 db.marque.hasMany(db.produit, { foreignKey: "marqueId" });
-db.categorie.hasMany(db.sousCategorie, { foreignKey: "categorieId" });
-db.coiffeur.hasMany(db.client, { foreignKey: "coiffeurId" });
-db.paiement.hasOne(db.facture, { foreignKey: "paiementId" });
-db.produit.hasMany(db.image, { foreignKey: "produitId" });
-db.salon.hasMany(db.image, { foreignKey: "salonId" });
-db.carteMenu.hasMany(db.image, { foreignKey: "carteMenuId" });
-
-db.blog.hasMany(db.image, { foreignKey: "blogId" });
 db.marque.hasMany(db.image, { foreignKey: "marqueId" });
-
-
-
 
 db.salon.belongsToMany(db.statistique, { through: "Concerner", foreignKey: "salonId" });
 db.statistique.belongsToMany(db.salon, { through: "Concerner", foreignKey: "statistiqueId" });
@@ -90,37 +75,41 @@ db.statistique.belongsToMany(db.salon, { through: "Concerner", foreignKey: "stat
 db.salon.belongsToMany(db.carteMenu, { through: "Posseder", foreignKey: "salonId" });
 db.carteMenu.belongsToMany(db.salon, { through: "Posseder", foreignKey: "carteMenuId" });
 
-
-
-
 db.salon.belongsToMany(db.avis, { through: "notersalon", foreignKey: "salonId" });
 db.avis.belongsToMany(db.salon, { through: "notersalon", foreignKey: "avisId" });
 
 db.produit.belongsToMany(db.statistique, { through: "Impliquer", foreignKey: "produitId" });
 db.statistique.belongsToMany(db.produit, { through: "Impliquer", foreignKey: "statistiqueId" });
 
-db.commande.belongsToMany(db.produit, { through: "Contenir", foreignKey: "commandeId" });
-db.produit.belongsToMany(db.commande, { through: "Contenir", foreignKey: "produitId" });
-
 db.produit.belongsToMany(db.avis, { through: "noterproduit", foreignKey: "produitId" });
 db.avis.belongsToMany(db.produit, { through: "noterproduit", foreignKey: "avisId" });
 
-db.produit.belongsToMany(db.fournisseur, { through: "Fournir", foreignKey: "produitId" });
-db.fournisseur.belongsToMany(db.produit, { through: "Fournir", foreignKey: "fournisseurId" });
-
 db.produit.belongsToMany(db.sousCategorie, { through: "Detenir", foreignKey: "produitId" });
 db.sousCategorie.belongsToMany(db.produit, { through: "Detenir", foreignKey: "sousCategorieId" });
-
-
-
-//lien entre la clé étrangére et la table de référence
-db.noterproduit.belongsTo(db.produit, { foreignKey: 'produitId', as: 'produit', });
-db.noterproduit.belongsTo(db.client, { foreignKey: 'clientId', as: 'client', });
 
 db.notersalon.belongsTo(db.salon, { foreignKey: 'salonId', as: 'salon', });
 db.notersalon.belongsTo(db.client, { foreignKey: 'clientId', as: 'client', });
 
 
+
+db.paiement.hasMany(db.commande, { foreignKey: "paiementId" });
+db.categorie.hasMany(db.sousCategorie, { foreignKey: "categorieId" });
+db.paiement.hasOne(db.facture, { foreignKey: "paiementId" });
+db.blog.hasMany(db.client, { foreignKey: "blogId" });
+db.client.hasMany(db.avis, { foreignKey: "clientId" });
+db.client.hasMany(db.commande, { foreignKey: "clientId" });
+db.produit.hasMany(db.image, { foreignKey: "produitId" });
+db.blog.hasMany(db.image, { foreignKey: "blogId" });
+
+db.commande.belongsToMany(db.produit, { through: "Contenir", foreignKey: "commandeId" });
+db.produit.belongsToMany(db.commande, { through: "Contenir", foreignKey: "produitId" });
+
+db.produit.belongsToMany(db.fournisseur, { through: "Fournir", foreignKey: "produitId" });
+db.fournisseur.belongsToMany(db.produit, { through: "Fournir", foreignKey: "fournisseurId" });
+
+//lien entre la clé étrangére et la table de référence
+db.noterproduit.belongsTo(db.produit, { foreignKey: 'produitId', as: 'produit', });
+db.noterproduit.belongsTo(db.client, { foreignKey: 'clientId', as: 'client', });
 
 db.dbinfo = dbinfo;
 db.Sequelize = Sequelize;

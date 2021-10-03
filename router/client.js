@@ -6,7 +6,7 @@ var db = require("../database/db");
 var randtoken = require('rand-token');
 
 process.env.SECRET_KEY = 'secret';
-
+//mon registeur
 router.post("/registor", (req, res) => {
     console.log(req.body);
     db.client
@@ -41,7 +41,7 @@ router.post("/registor", (req, res) => {
                             from: "projetsidibe1@gmail.com",
                             to: item.email,
                             subject: "Bienvenue dans HairStyle",
-                            text: "http://localhost:8080/validemail/" +
+                            text: "https://hairs-style.fr/validemail/" +
                                 " Valider votre compte client " +
                                 " ",
                         };
@@ -107,7 +107,44 @@ router.post("/llogin", (req, res) => {
             res.json(err);
         });
 });
+/*
+router.post("/login", (req, res) => {
+    //eslint-disable-next-line
+    console.log(req.body)
+    database.client.findOne({
+            where: {
+                email: req.body.email
+            }
+        })
+        .then(client => {
+            // req.body.password : c'est celui saisi , user.password : c'est celui de la database , compareSync les compares
+            if (client) {
 
+
+                // tu me compare le mot de passe entre et celui qui est dans ma base de donner
+                if (bcrypt.compareSync(req.body.password, client.password)) {
+
+                    //  Nous créons un jeton d'authentification pour l'utilisateur avec le jwt
+                    let token = jwt.sign(client.dataValues, process.env.SECRET_KEY, {
+                        expiresIn: 1440
+                    });
+                    // Je recupere le token
+                    // tu m'envoie statu 200 si ses bon 
+                    res.status(200.).json({
+                        token: token
+                    })
+                } else {
+                    res.status(404).send('message erreur ou mot de passe erreur')
+                }
+            } else {
+                res.status(404).json("error")
+            }
+        })
+        .catch(err => {
+            res.status(404).send('error ' + err)
+        })
+
+});*/
 
 router.post("/sendmail", (req, res) => {
     var token = randtoken.generate(16);
@@ -141,7 +178,7 @@ router.post("/sendmail", (req, res) => {
                             to: item.email,
                             subject: "Bienvenue dans HairStyle",
 
-                            html: "<a href=http://localhost:3000/client/validemail/" + item.forget + ">Valider votre mail</a>"
+                            html: "<a href=https://localhost:3000/client/validemail/" + item.forget + ">Valider votre mail</a>"
                         };
 
                         transporter.sendMail(mailOptions, function(error, info) {
@@ -318,34 +355,40 @@ router.post("/updatepassword", (req, res) => {
         })
 });
 
+
+// route permet valider son adresse mail
 router.post("/validemail", (req, res) => {
     db.client.findOne({
-            where: { email: req.body.email }
-        }).then(client => {
+            // recuperer le email
+            where: { email: req.body.email },
+        })
+        .then((client) => {
             if (client) {
-                //verifier si sont status est a 1 sinon tu le met a jour
                 if (client.Status !== 1) {
-                    client.update({
-                            Status: 1
+                    // changer le status qui devient un compte valide et il peut l'utiliser
+                    client
+                        .update({
+                            Status: 1,
                         })
+                        // L'utilisateur va recevoir ce message
                         .then(() => {
                             res.json({
-                                message: "votre email est validé"
-                            })
+                                message: "votre compte a été activer",
+                            });
                         })
-                        .catch(err => {
+                        .catch((err) => {
                             res.json(err);
-                        })
+                        });
                 } else {
-                    res.json("votre mail est déja validé")
+                    res.json("votre compte est déja validé");
                 }
             } else {
-                res.status(404).json("client not found !!!")
+                res.status(404).json("client not found !!!");
             }
         })
-        .catch(err => {
-            res.json(err)
-        })
+        .catch((err) => {
+            res.json(err);
+        });
 });
 
 
@@ -388,26 +431,25 @@ router.put('/udapte/:id', (req, res) => {
         })
 })
 
-router.get("/profile/:id", (req, res) => {
-    db.client.findOne({
-            where: { id: req.params.id }
+router.get("/profil/:id", (req, res) => {
+    db.client
+        .findOne({
+            where: { id: req.params.id },
         })
-        .then(client => {
+        .then((client) => {
             if (client) {
-                let token = jwt.sign(client.dataValues,
-                    process.env.SECRET_KEY, {
-                        expiresIn: 1440
-                    });
-                res.status(200).json({ token: token })
+                let token = jwt.sign(client.dataValues, process.env.SECRET_KEY, {
+                    expiresIn: 1440,
+                });
+                res.status(200).json({ token: token });
             } else {
-                res.json("error le client n'est pas dans la base !!")
+                res.json("error le client n'est pas dans la base !!");
             }
         })
-        .catch(err => {
-            res.json(err)
-        })
+        .catch((err) => {
+            res.json(err);
+        });
 });
-
 router.get("/getById/:id", (req, res) => {
     db.client
         .findOne({
